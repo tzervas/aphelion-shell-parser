@@ -40,31 +40,44 @@ parse_python_project() {
     local project_info=""
 
     # Check if any Python project files exist before gathering info
-    if [ ! -f "pyproject.toml" ] && [ ! -f "poetry.lock" ] && [ ! -f "requirements.txt" ]; then
+    if [ ! -f "pyproject.toml" ] && [ ! -f "poetry.lock" ] && [ ! -f "requirements.txt" ] && \
+       [ ! -f "setup.py" ] && [ ! -f "setup.cfg" ] && [ ! -f "Pipfile" ]; then
         return
     fi
 
     # Get the default project name based on the directory name
-    local project_name=$(get_default_project_name)
+    local project_name
+    project_name=$(get_default_project_name)
 
     # Check for Poetry managed project (pyproject.toml)
     if [ -f "pyproject.toml" ]; then
-        local poetry_project_name=$(get_poetry_project_name)
-        local poetry_project_version=$(get_poetry_project_version)
+        local poetry_project_name
+        local poetry_project_version
+        poetry_project_name=$(get_poetry_project_name)
+        poetry_project_version=$(get_poetry_project_version)
         project_info="Poetry|${poetry_project_name:-$project_name} v${poetry_project_version}"
     elif [ -f "poetry.lock" ]; then
         # Fallback to details from poetry.lock
-        local poetry_lock_project_name=$(get_poetry_lock_project_name)
+        local poetry_lock_project_name
+        poetry_lock_project_name=$(get_poetry_lock_project_name)
         project_name="${poetry_lock_project_name:-$project_name}"
         project_info="Poetry|${project_name}"
     fi
 
     # If neither pyproject.toml nor poetry.lock is available
     if [ -z "$project_info" ]; then
+        # Check for Pipfile (Pipenv)
+        if [ -f "Pipfile" ]; then
+            project_info="Pipenv|${project_name}"
+        # Check for setup.py or setup.cfg (setuptools)
+        elif [ -f "setup.py" ] || [ -f "setup.cfg" ]; then
+            project_info="setuptools|${project_name}"
         # Check for requirements.txt and count dependencies
-        if [ -f "requirements.txt" ]; then
-            local requirements_count=$(count_requirements_dependencies)
-            local reqs_project_name=$(get_requirements_project_name)
+        elif [ -f "requirements.txt" ]; then
+            local requirements_count
+            local reqs_project_name
+            requirements_count=$(count_requirements_dependencies)
+            reqs_project_name=$(get_requirements_project_name)
             project_name="${reqs_project_name:-$project_name}"
             project_info="proj:($project_name|deps:$requirements_count)"
         fi

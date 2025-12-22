@@ -78,3 +78,28 @@ EOF
     result=$(parse_python_project)
     [[ "$result" =~ "my-test-project" ]]
 }
+
+@test "parse_python_project detects setup.py" {
+    cat > setup.py <<EOF
+from setuptools import setup
+setup(name='test-setup-project')
+EOF
+    
+    result=$(parse_python_project)
+    [[ "$result" =~ "setuptools" ]]
+}
+
+@test "parse_python_project detects Pipfile" {
+    cat > Pipfile <<EOF
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+flask = "*"
+EOF
+    
+    result=$(parse_python_project)
+    [[ "$result" =~ "Pipenv" ]]
+}
