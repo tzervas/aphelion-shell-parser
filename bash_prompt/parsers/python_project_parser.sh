@@ -1,6 +1,8 @@
+#!/bin/bash
+
 # Function to get the default project name based on the directory name
 get_default_project_name() {
-    echo "$(basename "$(pwd)")"
+    basename "$(pwd)"
 }
 
 # Function to extract project name from pyproject.toml

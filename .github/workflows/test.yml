@@ -1,0 +1,44 @@
+name: Test Parsers
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y bats git jq
+    
+    - name: Run tests
+      run: ./run_tests.sh
+    
+    - name: Run ShellCheck
+      run: |
+        sudo apt-get install -y shellcheck
+        shellcheck bash_prompt/parsers/*.sh
+        shellcheck bash_prompt/prompt_generator.sh
+        shellcheck run_tests.sh
+
+  docker-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Build Docker image
+      run: docker build -t aphelion-parser-test .
+    
+    - name: Run tests in container
+      run: |
+        docker run --rm aphelion-parser-test bash -c "cd /workspace && ./run_tests.sh"

@@ -14,13 +14,16 @@ parse_git_info() {
     fi
 
     # Get the current Git branch
-    local branch=$(git branch 2> /dev/null | grep '*' | sed 's/* //')
+    local branch
+    branch=$(git branch 2> /dev/null | grep '\*' | sed 's/* //')
 
     # Get the Git status (abbreviated)
-    local status=$(git status -s 2> /dev/null | awk '{print $1}' | uniq | xargs)
+    local status
+    status=$(git status -s 2> /dev/null | awk '{print $1}' | uniq | xargs)
 
     # Get the last commit hash (abbreviated)
-    local last_commit=$(git log -1 --pretty=format:"%h" 2> /dev/null)
+    local last_commit
+    last_commit=$(git log -1 --pretty=format:"%h" 2> /dev/null)
 
     # Only output if we're in a git repository
     if [ -n "$branch" ] || [ -n "$status" ] || [ -n "$last_commit" ]; then
