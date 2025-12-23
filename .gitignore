@@ -1,0 +1,25 @@
+# Extracted files from zip
+aphelion-git-parser-main/
+aphelion-git-parser-main.zip
+
+# Backup files
+*.backup
+*~
+*.swp
+
+# Test artifacts
+*.log
+test-output/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.iml
+
+# Temporary files
+tmp/
+temp/
